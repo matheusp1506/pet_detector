@@ -1,0 +1,7 @@
+ultralytics
+opencv-python-headless
+python-dotenv
+requests
+lap
+# Only needed for dvr_download.py (NVR recording download):
+# pip install git+https://github.com/OpenIPC/python-dvr.git

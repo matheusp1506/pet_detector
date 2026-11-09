@@ -1,0 +1,52 @@
+[Unit]
+Description=Pet Detector - monitoramento de pets via YOLO + Telegram
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+
+# Ajuste User/WorkingDirectory conforme onde o projeto foi
+# copiado no servidor.
+User=petdetector
+WorkingDirectory=/opt/pet_detector
+EnvironmentFile=/opt/pet_detector/.env
+
+# Usuário de serviço não tem $HOME; aponta explicitamente onde
+# o Ultralytics pode gravar seu cache/config (settings.json).
+Environment=YOLO_CONFIG_DIR=/opt/pet_detector/.config/Ultralytics
+Environment=HOME=/opt/pet_detector
+
+ExecStartPre=/bin/mkdir -p /opt/pet_detector/.config/Ultralytics
+ExecStart=/opt/pet_detector/venv/bin/python3 /opt/pet_detector/pet_detector_server.py
+
+# Auto-recuperação: reinicia sempre que o processo sair, com
+# um pequeno intervalo para não ficar em loop rápido demais se
+# algo estiver quebrado (ex: credencial errada).
+Restart=always
+RestartSec=10
+
+# Encerramento limpo: dá tempo do processo tratar SIGTERM
+# (fechar conexão RTSP, etc) antes de matar.
+TimeoutStopSec=15
+
+# Endurecimento leve (opcional, mas recomendado). Comente se
+# causar problemas de permissão inesperados.
+NoNewPrivileges=true
+PrivateTmp=true
+
+# Servidor compartilhado com outros serviços (site, banco de
+# dados, outro bot) e pouca RAM total — limite duro para o
+# pet-detector nunca conseguir esgotar a memória da máquina e
+# derrubar os demais. Se o processo ultrapassar, o kernel mata
+# o serviço (que o Restart=always sobe de novo), em vez de
+# deixar o OOM killer escolher livremente qual processo matar.
+MemoryMax=1000M
+MemoryHigh=900M
+
+# Evita competir agressivamente por CPU com Apache/MySQL.
+CPUWeight=50
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,30 @@
+# Secrets
+.env
+.env.*
+!.env.example
+deploy/.env.production
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Model weights (large; distribute separately / Git LFS / Releases)
+*.pt
+
+# Training outputs and logs
+runs/
+train_*log*.txt
+
+# Datasets and videos
+dataset/
+*.mp4
+*.h264
+
+# Camera snapshots of the property (privacy)
+*.jpg
+*.jpeg
+
+# Local tooling
+.claude/
